@@ -1,0 +1,12 @@
+# Weekly proposals to update pinned tools and CI actions. Each one arrives as a pull request and must pass `tests`.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

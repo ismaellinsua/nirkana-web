@@ -1,0 +1,19 @@
+__pycache__/
+.pytest_cache/
+.venv/
+
+# Datos del titular para los textos legales (se publican en docs/ con ops/legal.py): nunca al repositorio
+legal/datos.json
+NEGOCIO.md
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.enc
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+backups/
