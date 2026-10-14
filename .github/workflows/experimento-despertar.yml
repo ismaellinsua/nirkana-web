@@ -1,0 +1,47 @@
+# TEMPORARY experiment (to be deleted): which kind of request makes Render wake the sleeping free trial?
+name: Experimento despertar
+
+on:
+  workflow_dispatch:
+    inputs:
+      variante:
+        description: "imagen (como el navegador pide una imagen), pagina (como navegar) o curl (sin cabeceras)"
+        required: true
+        default: imagen
+
+permissions: {}
+
+jobs:
+  probar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Probar
+        env:
+          VARIANTE: ${{ inputs.variante }}
+        run: |
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+          URL=https://nirkana-prueba.onrender.com/icons/simbolo.svg
+          case "$VARIANTE" in
+            imagen)
+              H=(-A "$UA" -H "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+                 -H "Sec-Fetch-Dest: image" -H "Sec-Fetch-Mode: no-cors" -H "Sec-Fetch-Site: cross-site" -H "Referer: https://nirkana.es/")
+              ;;
+            pagina)
+              URL=https://nirkana-prueba.onrender.com/
+              H=(-A "$UA" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                 -H "Sec-Fetch-Dest: document" -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Site: cross-site" -H "Upgrade-Insecure-Requests: 1")
+              ;;
+            *)
+              H=()
+              ;;
+          esac
+          date -u +"Inicio %H:%M:%S UTC, variante $VARIANTE, $URL"
+          for attempt in $(seq 1 18); do
+            code=$(curl --silent --output /tmp/body --dump-header /tmp/head --max-time 20 --write-out '%{http_code}' "${H[@]}" "$URL" || true)
+            echo "Intento $attempt ($(date -u +%H:%M:%S)): HTTP $code | $(grep -i -E '^(x-render|rndr|server|content-type|location|retry-after)' /tmp/head | tr -d '\r' | tr '\n' ' ') | $(head -c 160 /tmp/body | tr '\n' ' ')"
+            if [ "$code" = "200" ] && [ "$VARIANTE" != "pagina" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
