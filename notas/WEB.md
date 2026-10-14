@@ -80,6 +80,18 @@ admite imágenes del servicio de la prueba (`img-src`), y `web-boundaries` exige
 dirección, cambia las dos cosas. El arreglo de fondo es el plan de pago de Render (siempre encendido): con él esa pantalla
 casi no se ve.
 
+**Mantener despierta la prueba sin plan de pago.** Mientras la prueba esté en el plan gratuito de Render, el flujo
+`.github/workflows/despertar-prueba.yml` le pide una imagen pequeña cada 5 minutos, de 8:00 a 23:00 aproximadamente (hora de
+España): así de día no se duerme y el primer visitante no espera. Reglas que no hay que romper (las vigila
+`tests/test_despertar_prueba.py`): pide siempre un archivo estático y **nunca** `/api/health`, que consulta la base de datos y
+gastaría las horas gratuitas de Neon; y no pasa de 17 horas al día, porque Render da 750 horas gratis al mes a todo el espacio
+(unas 500 las gasta esto; el resto cubre visitas de noche). De madrugada la prueba se duerme y la pantalla de espera de la web
+cubre ese primer clic. GitHub puede retrasar los avisos programados algún minuto, así que de vez en cuando alguien verá
+la pantalla de espera aunque sea de día.
+
+Cuando la prueba pase al plan Starter de Render (siempre encendido): en este repositorio, Settings → Secrets and variables →
+Actions → Variables → nueva variable `PRUEBA_DE_PAGO` = `si`. El flujo deja de pedir la imagen (puedes borrarlo más adelante).
+
 ### La demo («Probar la demo»)
 
 `demo/index.html` es **NirKanA entera en un solo archivo** (la app con un negocio de ejemplo: bar, tienda, peluquería o
