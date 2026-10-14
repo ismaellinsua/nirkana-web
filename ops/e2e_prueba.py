@@ -2,8 +2,9 @@
 
     python ops/e2e_prueba.py [https://nirkana.es/]
 
-Opens the site, presses the first visible «Probar gratis», and measures: when the waiting screen appears, when the visitor
-lands on the trial, and when the trial's own page is usable. Meant to be run when the free trial is asleep (it sleeps after
+First it reads what the home page shows (the price and the visible e-mail address), so the same run also confirms that the
+published page is the current one. Then it presses the first visible «Probar gratis» and measures: when the waiting screen
+appears, when the visitor lands on the trial, and when the trial's own page is usable. Meant to be run when the free trial is asleep (it sleeps after
 15 minutes without visits); it only reads, never signs up. Exit code 1 when the trial never became usable in 4 minutes.
 """
 
@@ -23,6 +24,13 @@ def main() -> int:
         browser = pw.chromium.launch(channel="chrome")
         page = browser.new_page(viewport={"width": 1280, "height": 800})
         page.goto(SITE, wait_until="load")
+        price = page.locator("#precio h2")
+        address = page.locator("#email-text")
+        print(f"Precio publicado: «{price.inner_text().strip() if price.count() else 'no hay sección de precio'}»")
+        print(f"Email visible: «{address.inner_text().strip() if address.count() else 'no se ve'}»")
+        if not price.count() or not address.count() or not address.inner_text().strip():
+            print("  FALLA: la web publicada no enseña el precio o el email")
+            return 1
         link = page.locator("a[data-trial]:visible").first
         print(f"Botón: «{link.inner_text().strip()}» → {link.get_attribute('href')}")
         started = time.time()
