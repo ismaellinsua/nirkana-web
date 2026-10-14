@@ -10,6 +10,11 @@ on:
     branches: [main]
     paths: ["docs/**", "ops/web_check.py"]
   workflow_dispatch:
+    inputs:
+      tras_traspaso:
+        description: "Marcar al terminar el traspaso desde el repositorio antiguo: comprueba además que las notas internas ya no se publican"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -31,4 +36,11 @@ jobs:
         run: sleep 180
 
       - name: Comprobar nirkana.es
-        run: python ops/web_check.py
+        env:
+          TRAS_TRASPASO: ${{ inputs.tras_traspaso }}
+        run: |
+          if [ "$TRAS_TRASPASO" = "true" ]; then
+            python ops/web_check.py --sin-notas-internas
+          else
+            python ops/web_check.py
+          fi

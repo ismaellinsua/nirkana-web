@@ -8,6 +8,7 @@ Checks, from outside, what GitHub Pages and the DNS provider do and nobody else 
     DNS changes, renewal fails silently and the site breaks the day it expires),
   - http:// and www. send visitors to https://domain/ (Enforce HTTPS),
   - every page in docs/ answers 200 (the published site is the one in the repository).
+  - with --sin-notas-internas (once the site is published from this repository): the internal notes of notas/ answer 404.
 Environment: WEB_DOMAIN (defaults to docs/CNAME). Exit code 1 when something is wrong, so the scheduled run turns red
 and GitHub emails the repository owner.
 """
@@ -21,7 +22,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DOCS = Path(__file__).resolve().parent.parent / "docs"
+ROOT = Path(__file__).resolve().parent.parent
+DOCS = ROOT / "docs"
+NOTES = ROOT / "notas"
 # GitHub Pages' addresses (docs.github.com → «Managing a custom domain for your GitHub Pages site»).
 PAGES_IPS = {"185.199.108.153", "185.199.109.153", "185.199.110.153", "185.199.111.153",
              "2606:50c0:8000::153", "2606:50c0:8001::153", "2606:50c0:8002::153", "2606:50c0:8003::153"}
@@ -119,13 +122,27 @@ def http_problems(name: str, get=fetch) -> list[str]:
     return problems
 
 
+def internal_notes() -> list[str]:
+    """The notes kept in notas/ (outside docs/), as the addresses they would have if they were published by mistake."""
+    return ["/" + note.name for note in sorted(NOTES.glob("*.md"))] if NOTES.is_dir() else []
+
+
+def internal_problems(name: str, get=fetch) -> list[str]:
+    """Internal notes that the published site still serves (they were public while the site came from the old repository)."""
+    return [f"Web: https://{name}{path} se publica y es una nota interna (responde {status}, debería ser 404)"
+            for path in internal_notes() if (status := get(f"https://{name}{path}")[0]) != 404]
+
+
 def main() -> int:
     name = domain()
     problems = dns_problems(name) + certificate_problems(name) + http_problems(name)
+    if "--sin-notas-internas" in sys.argv:
+        problems += internal_problems(name)
     for problem in problems:
         print(f"::error::{problem}" if os.environ.get("GITHUB_ACTIONS") else problem)
     if not problems:
-        print(f"OK {name}: DNS en GitHub Pages, certificado válido, redirecciones y {len(pages())} páginas.")
+        extra = f" y {len(internal_notes())} notas internas sin publicar" if "--sin-notas-internas" in sys.argv else ""
+        print(f"OK {name}: DNS en GitHub Pages, certificado válido, redirecciones y {len(pages())} páginas{extra}.")
     return 1 if problems else 0
 
 

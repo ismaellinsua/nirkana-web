@@ -106,3 +106,19 @@ def test_main_reports_and_fails(monkeypatch, capsys):
     assert web_check.main() == 1 and "::error::DNS: x" in capsys.readouterr().out
     monkeypatch.setattr(web_check, "dns_problems", lambda name: [])
     assert web_check.main() == 0 and "OK nirkana.es" in capsys.readouterr().out
+
+
+def test_internal_notes_must_answer_404_once_the_site_comes_from_this_repository():
+    notes = web_check.internal_notes()
+    assert "/WEB.md" in notes and "/TRASPASO.md" in notes and all(n.endswith(".md") for n in notes)
+
+    def clean(url, follow=True):
+        return 404, url, ""
+
+    assert web_check.internal_problems("nirkana.es", clean) == []
+
+    def leaking(url, follow=True):
+        return (200, url, "# notas") if url.endswith("/WEB.md") else (404, url, "")
+
+    problems = web_check.internal_problems("nirkana.es", leaking)
+    assert problems == ["Web: https://nirkana.es/WEB.md se publica y es una nota interna (responde 200, debería ser 404)"]
