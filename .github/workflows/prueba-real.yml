@@ -1,0 +1,26 @@
+# Manual check, run when the free trial is asleep: opens https://nirkana.es in a real Chrome, presses «Probar gratis» and
+# prints how long the visitor waits (see ops/e2e_prueba.py). It only reads: it never signs anyone up.
+name: Probar la prueba como un visitante
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visitante:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version-file: .python-version
+
+      - name: Playwright (usa el Chrome que ya trae el equipo)
+        run: pip install --quiet playwright==1.63.0
+
+      - name: Pulsar «Probar gratis»
+        run: python ops/e2e_prueba.py https://nirkana.es/
