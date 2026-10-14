@@ -20,11 +20,19 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 6
     steps:
-      # A sleeping trial answers 502 at once (and starts waking up); it takes up to about a minute to answer 200.
+      # A sleeping trial answers 502 and takes from half a minute to several minutes to answer 200. Which kind of request
+      # wakes it fastest is not documented, so odd attempts ask like a browser asking for an image and even ones like a
+      # browser opening the page; both ask for the same static file.
       - name: Pedir una imagen de la prueba
         run: |
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            code=$(curl --silent --output /dev/null --max-time 15 --write-out '%{http_code}' \
+            if [ $((attempt % 2)) -eq 1 ]; then
+              kind=(-H "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" -H "Sec-Fetch-Dest: image" -H "Sec-Fetch-Mode: no-cors")
+            else
+              kind=(-H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Sec-Fetch-Dest: document" -H "Sec-Fetch-Mode: navigate")
+            fi
+            code=$(curl --silent --output /dev/null --max-time 15 --write-out '%{http_code}' -A "$UA" "${kind[@]}" \
                    https://nirkana-prueba.onrender.com/icons/simbolo.svg || true)
             echo "Intento $attempt: HTTP $code"
             if [ "$code" = "200" ]; then
