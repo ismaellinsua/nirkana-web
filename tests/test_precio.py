@@ -19,9 +19,10 @@ def test_the_published_page_has_the_price_in_all_places_and_they_agree():
 
 
 def test_changing_the_price_changes_every_place_and_nothing_else():
-    changed = precio.change(HTML, 60)
-    assert precio.problems(changed) == [] and precio.current(changed) == 60
-    assert "desde 60 € al mes" in changed.lower() and '"price": "60"' in changed
+    other = precio.current(HTML) + 7
+    changed = precio.change(HTML, other)
+    assert precio.problems(changed) == [] and precio.current(changed) == other
+    assert f"desde {other} € al mes" in changed.lower() and f'"price": "{other}"' in changed
     # only those eight numbers differ
     assert precio.change(changed, precio.current(HTML)) == HTML
 
@@ -38,7 +39,8 @@ def test_the_command_refuses_nonsense(tmp_path, monkeypatch):
     monkeypatch.setattr(precio, "HOME", page)
     assert precio.main(["precio.py", "abc"]) == 2
     assert precio.main(["precio.py", "0"]) == 2
-    assert precio.main(["precio.py", "40"]) == 0 and precio.current(page.read_text(encoding="utf-8")) == 40
+    other = precio.current(HTML) + 7
+    assert precio.main(["precio.py", str(other)]) == 0 and precio.current(page.read_text(encoding="utf-8")) == other
     assert precio.main(["precio.py"]) == 0                              # reading changes nothing
 
 
