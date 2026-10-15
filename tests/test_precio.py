@@ -27,6 +27,15 @@ def test_changing_the_price_changes_every_place_and_nothing_else():
     assert precio.change(changed, precio.current(HTML)) == HTML
 
 
+def test_the_price_is_without_vat_and_losing_that_is_reported():
+    assert len(precio.WITHOUT_VAT.findall(HTML)) == 0
+    lost = HTML.replace("al mes + IVA", "al mes", 1)
+    assert any("IVA" in p for p in precio.problems(lost))
+    undeclared = HTML.replace('"valueAddedTaxIncluded": false', '"valueAddedTaxIncluded": true')
+    assert any("valueAddedTaxIncluded" in p for p in precio.problems(undeclared))
+    assert precio.problems(precio.change(HTML, 75)) == []   # changing the number keeps «+ IVA»
+
+
 def test_a_missing_place_or_a_different_number_is_reported():
     assert precio.problems(HTML.replace("Desde", "A partir de", 1))   # one sentence gone
     split = HTML.replace('"price": "', '"price": "9', 1)               # one offer says another number

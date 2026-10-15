@@ -5,7 +5,8 @@
 
 The number appears in eight places of docs/index.html: six sentences (the line under the hero button, the price section,
 the calculator, the «¿Cuánto cuesta?» answer and its copy in the FAQPage data) and the two prices of the Offer data that
-search engines read. Changing them by hand and missing one would leave the page contradicting itself. The price you charge
+search engines read. The price is without VAT: every sentence says «+ IVA» and the Offer data says
+"valueAddedTaxIncluded": false; the check reports a sentence that lost it. Changing them by hand and missing one would leave the page contradicting itself. The price you charge
 by card is the one set in Stripe (Product → Price): change it there too, or the web and the checkout will disagree.
 """
 
@@ -17,6 +18,7 @@ HOME = Path(__file__).resolve().parent.parent / "docs" / "index.html"
 SENTENCE = re.compile(r"(desde )(\d+)( € al mes)", re.IGNORECASE)
 OFFER = re.compile(r'("price": ")(\d+)(")')
 EXPECTED = {"frases": 6, "datos de buscadores": 2}
+WITHOUT_VAT = re.compile(r"desde \d+ € al mes(?! \+ IVA)", re.IGNORECASE)
 
 
 def found(html: str) -> dict[str, list[int]]:
@@ -29,6 +31,10 @@ def problems(html: str) -> list[str]:
     places = found(html)
     out = [f"Se esperaban {EXPECTED[kind]} cifras en {kind} y hay {len(numbers)}"
            for kind, numbers in places.items() if len(numbers) != EXPECTED[kind]]
+    if (lost := len(WITHOUT_VAT.findall(html))):
+        out.append(f"{lost} frase(s) del precio no dicen «+ IVA» (el precio es sin IVA)")
+    if '"valueAddedTaxIncluded": false' not in html:
+        out.append('Los datos estructurados del precio no declaran "valueAddedTaxIncluded": false')
     everything = {n for numbers in places.values() for n in numbers}
     if len(everything) > 1:
         out.append(f"La página dice precios distintos: {sorted(everything)}")
@@ -59,7 +65,7 @@ def main(argv: list[str]) -> int:
     for problem in found_problems:
         print(f"ERROR: {problem}")
     if not found_problems:
-        print(f"Precio de la web: desde {current(html)} € al mes (en las 8 cifras de docs/index.html).")
+        print(f"Precio de la web: desde {current(html)} € al mes + IVA (en las 8 cifras de docs/index.html).")
         if len(argv) > 1:
             print("Recuerda: el precio de cobro con tarjeta es el de Stripe (Product → Price); cámbialo allí también.")
     return 1 if found_problems else 0
