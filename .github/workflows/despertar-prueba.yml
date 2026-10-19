@@ -4,7 +4,12 @@
 # never ask for anything that reaches the database (/api/health does: Neon's free compute hours would run out), and
 # it uses about 500 of Render's 750 free instance hours a month (tests/test_despertar_prueba.py keeps both true).
 # Switch it off for good once the trial runs on a paid Render plan: Settings → Secrets and variables → Actions →
-# Variables → PRUEBA_DE_PAGO = si. It never fails the run: the daily external check of the trial is what raises alarms.
+# Variables → PRUEBA_DE_PAGO = si. It never fails the run: the daily external check of the trial (ops/web_check.py, workflow
+# «Web») is what raises alarms.
+# Seen from 15 to 18/10/2026: GitHub runs frequent schedules late and skips most of them (23 runs in three and a half days,
+# about one every 2-3 hours instead of every 5 minutes), so this helps but does NOT guarantee that the trial stays awake: the
+# first visitor after a quiet spell can still wait for it (the site shows its own waiting screen meanwhile). Only an always-on
+# Render plan, or an external pinger, keeps it awake for sure.
 name: Despertar la prueba
 
 on:
