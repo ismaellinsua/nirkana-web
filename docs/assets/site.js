@@ -329,6 +329,9 @@ const ANALYTICS = { goatcounter: "nirkana" };
         tipo: clean(data.get("tipo"), 40), email: clean(data.get("email"), 120),
         telefono: clean(data.get("telefono"), 20), mensaje: clean(data.get("mensaje"), 1500),
         promocion: data.get("promocion") ? clean(promoBox.value, 60) : "",
+        consentimiento_comercial: data.get("consentimiento_comercial") === "si" ? "SI" : "NO",
+        consentimiento_comercial_texto: "v1-2026-10-20",
+        consentimiento_comercial_fecha: new Date().toISOString(),
       };
       const button = form.querySelector("button[type=submit]");
 
