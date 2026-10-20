@@ -1,0 +1,77 @@
+# Checks from the outside that the free trial (nirkana-prueba on Render) runs the version of the front-end that was just
+# deployed: it answers its health check, serves the service worker of that version and the files that version added, is the
+# 24-hour trial with sign-up open, and sends its content security policy. Run it by hand after each deployment:
+# Actions → «Comprobar la prueba publicada» → Run workflow, with the version (the number at the top of app/static/sw.js in the
+# private repository, e.g. nirkana-shell-v36). It only reads (the health check once, static files and headers) and prints
+# addresses and codes, never content. It lives here, in a public repository, because the private one may have no Actions
+# minutes left and the sandbox where the work is done cannot reach onrender.com.
+name: Comprobar la prueba publicada
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión del front-end que debe servir (nirkana-shell-vNN)"
+        required: true
+      archivos:
+        description: "Archivos que esa versión añadió y deben existir (separados por comas)"
+        default: "/js/agenda-grid.js,/js/audit-text.js,/js/whatsapp.js"
+      url:
+        description: "Dirección de la prueba"
+        default: "https://nirkana-prueba.onrender.com"
+
+permissions: {}
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Comprobar
+        env:
+          URL: ${{ inputs.url }}
+          VERSION: ${{ inputs.version }}
+          ARCHIVOS: ${{ inputs.archivos }}
+        run: |
+          set -u
+          fail=0
+          ok() { echo "OK   $1"; }
+          mal() { echo "MAL  $1"; fail=1; }
+          case "$VERSION" in nirkana-shell-v[0-9]*) ;; *) echo "Versión no válida"; exit 2 ;; esac
+          case "$URL" in https://*.onrender.com | https://prueba.nirkana.es) ;; *) echo "Dirección no admitida"; exit 2 ;; esac
+          base="${URL%/}"
+
+          # A sleeping service answers 502 for up to a few minutes while it starts.
+          code=000
+          for attempt in $(seq 1 24); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base/api/health" || true)
+            [ "$code" = 200 ] && break
+            sleep 10
+          done
+          if [ "$code" = 200 ]; then ok "/api/health responde 200"; else mal "/api/health responde $code"; fi
+
+          served=$(curl -s --max-time 20 "$base/sw.js" || true)
+          if echo "$served" | grep -q "const CACHE = \"$VERSION\""; then
+            ok "el service worker es $VERSION"
+          else
+            mal "el service worker no es $VERSION (entrega $(echo "$served" | grep -o 'nirkana-shell-v[0-9]*' | head -1))"
+          fi
+
+          IFS=, read -ra files <<< "$ARCHIVOS"
+          for file in "${files[@]}"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base$file" || true)
+            if [ "$code" = 200 ]; then ok "$file existe"; else mal "$file responde $code"; fi
+          done
+
+          info=$(curl -s --max-time 20 "$base/api/auth/info" || true)
+          if python3 -c 'import json, sys; d = json.loads(sys.argv[1]); assert d.get("mode") == "prueba" and d.get("signup_open") is True and d.get("trial_hours") == 24' "$info" 2>/dev/null; then
+            ok "es la prueba de 24 horas y deja empezar"
+          else
+            mal "/api/auth/info no describe la prueba de 24 horas con el alta abierta"
+          fi
+
+          policy=$(curl -s -D - -o /dev/null --max-time 20 "$base/" | grep -i '^content-security-policy:' | head -1 || true)
+          if echo "$policy" | grep -qi "script-src 'self'"; then ok "la política de seguridad de contenido está"; else mal "falta la política de seguridad de contenido"; fi
+
+          if [ "$fail" = 0 ]; then echo "Todo correcto."; else echo "Hay comprobaciones que fallan."; fi
+          exit "$fail"
