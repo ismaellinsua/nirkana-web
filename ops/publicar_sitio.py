@@ -2,7 +2,8 @@
 
 Este repositorio (el de trabajo) es privado: aquí están las notas, el código de apoyo, las pruebas y las plantillas. El repositorio
 público (nirkana-sitio) es solo el escaparate: la carpeta docs/ con las páginas, los estilos, los scripts y las imágenes que cualquiera
-puede abrir en nirkana.es, un README corto, la licencia y el flujo que mantiene despierta la prueba de 24 horas.
+puede abrir en nirkana.es, un README corto, una licencia de «todos los derechos reservados» que no nombra nada de lo privado (la
+de este repositorio sí) y el flujo que mantiene despierta la prueba de 24 horas.
 
     python ops/publicar_sitio.py ../nirkana-sitio            # copia y deja los cambios sin confirmar, para revisarlos
     python ops/publicar_sitio.py ../nirkana-sitio --check    # no escribe nada: sale con error si la copia pública no coincide
@@ -41,7 +42,7 @@ def files_under(folder: Path) -> list[Path]:
     return sorted(path for path in folder.rglob("*") if path.is_file())
 
 
-def expected(docs: Path = DOCS, templates: Path = TEMPLATES, root: Path = ROOT) -> dict[str, Path]:
+def expected(docs: Path = DOCS, templates: Path = TEMPLATES) -> dict[str, Path]:
     """The whole public tree: relative path in the public repository → the file in this one it comes from."""
     tree: dict[str, Path] = {}
     forbidden = []
@@ -56,7 +57,7 @@ def expected(docs: Path = DOCS, templates: Path = TEMPLATES, root: Path = ROOT) 
     if forbidden:
         raise PublishError("en docs/ hay archivos que no son de la web y no se publican (muévelos fuera de docs/): " + ", ".join(forbidden))
     tree["README.md"] = templates / "README.md"
-    tree["LICENSE"] = root / "LICENSE"
+    tree["LICENSE"] = templates / "LICENSE"
     tree[".github/workflows/despertar-prueba.yml"] = templates / "despertar-prueba.yml"
     for relative, source in tree.items():
         if not source.is_file():
