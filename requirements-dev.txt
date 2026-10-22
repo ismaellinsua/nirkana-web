@@ -2,6 +2,8 @@
 pytest==9.1.1
 pyflakes==4.0.3
 ruff==0.17.0
+# The Excel template of the cash count (ops/plantillas.py) and its test:
+openpyxl==3.1.5
 # Only to rewrite the screenshots (ops/capturas_web.py), not needed by CI:
 pillow
 playwright==1.63.0
