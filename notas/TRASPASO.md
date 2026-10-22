@@ -1,7 +1,7 @@
 # Separar lo público de lo privado: la web a `nirkana-sitio` y todo lo demás en privado
 
 **Estado (22/10/2026): Claude ha dejado preparado todo lo que no son clics de GitHub. Falta que tú crees un repositorio vacío y
-hagas los clics de los pasos B, D y E, cuando quieras.** `nirkana.es` sigue saliendo del repositorio antiguo hasta el paso D3.
+hagas los clics de los pasos A, B, D y E, cuando quieras.** `nirkana.es` sigue saliendo del repositorio antiguo hasta el paso D3.
 Nada de esto toca el DNS.
 
 ## La idea, en una frase
