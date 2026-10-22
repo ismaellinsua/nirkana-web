@@ -33,10 +33,10 @@ jobs:
           python-version-file: .python-version
 
       - name: La web solo promete lo que la app hace, y todo lo que enlaza existe
-        run: node --test tests/web-boundaries.test.mjs tests/web-claims.test.mjs tests/web-guias.test.mjs
+        run: node --test tests/web-boundaries.test.mjs tests/web-claims.test.mjs tests/web-guias.test.mjs tests/web-herramientas.test.mjs
 
       - name: Herramientas de Python
-        run: pip install --quiet pytest==9.1.1 pyflakes==4.0.3 ruff==0.17.0
+        run: pip install --quiet pytest==9.1.1 pyflakes==4.0.3 ruff==0.17.0 openpyxl==3.1.5
 
       - name: Revisión estática
         run: |
