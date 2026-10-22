@@ -3,8 +3,13 @@
 import re
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = (ROOT / ".github/workflows/despertar-prueba.yml").read_text(encoding="utf-8")
+# The workflow belongs in the public repository (free Actions minutes there); this is the copy ops/publicar_sitio.py puts in it.
+WORKFLOW = (ROOT / "ops/publico/despertar-prueba.yml").read_text(encoding="utf-8")
+# Until the handover (notas/TRASPASO.md) this repository is still public and runs the workflow itself; the handover deletes this copy.
+RUNNING_HERE = ROOT / ".github/workflows/despertar-prueba.yml"
 SITE = (ROOT / "docs/assets/site.js").read_text(encoding="utf-8")
 
 # Render gives 750 free instance hours a month to the whole workspace; leave room for visitors at night.
@@ -45,3 +50,13 @@ def test_it_can_be_switched_off_and_never_fails_the_run():
     assert "vars.PRUEBA_DE_PAGO != 'si'" in WORKFLOW
     assert "::warning::" in WORKFLOW
     assert re.search(r"^permissions: \{\}$", WORKFLOW, re.M), "it needs no access to the repository"
+
+
+def without_comments(text):
+    return [line for line in text.splitlines() if not line.lstrip().startswith("#")]
+
+
+def test_the_copy_that_runs_here_until_the_handover_does_the_same_as_the_public_one():
+    if not RUNNING_HERE.exists():
+        pytest.skip("el traspaso ya lo borró de este repositorio: corre en nirkana-sitio")
+    assert without_comments(RUNNING_HERE.read_text(encoding="utf-8")) == without_comments(WORKFLOW)

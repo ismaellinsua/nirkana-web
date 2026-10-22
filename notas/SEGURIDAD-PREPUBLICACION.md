@@ -1,13 +1,13 @@
 # NirKanA — checklist de seguridad antes de publicar
 
 ## Alcance
-- Web comercial y demo: solo los archivos de `docs/` se publican (GitHub Pages desde la carpeta `/docs`); el resto del repositorio no sale en `nirkana.es`.
+- Web comercial y demo: solo los archivos de `docs/` se publican (GitHub Pages desde la carpeta `/docs`); el resto no sale en `nirkana.es` (`tests/web-publico.test.mjs` y `ops/publicar_sitio.py` impiden que una nota, código o datos acaben en `docs/`).
 - La demo usa exclusivamente datos ficticios, sin conexión a la base de datos comercial.
 - `nirkana-app` y su repositorio, credenciales y base de datos permanecen separados.
 - La prueba de 24 horas debe tener base de datos y credenciales independientes.
 
 ## Secretos y datos
-- El repositorio de la web es público (GitHub Pages gratuito): nada que no deba verse puede estar en él. `nirkana-app` (código, credenciales y datos) es privado.
+- El único repositorio público es `nirkana-sitio` (GitHub Pages gratuito), y solo lleva lo que ya se ve en nirkana.es: nada que no deba verse puede estar en él. El trabajo de la web, `nirkana-app` (código, credenciales y datos) y el producto anterior son privados.
 - Nunca incorporar `.env`, certificados, claves, contraseñas ni datos reales de clientes a Git.
 - Utilizar secretos del proveedor de alojamiento para variables privadas del servidor.
 - Verificar historial de commits, artefactos CI, logs, archivos estáticos y backups.

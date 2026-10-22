@@ -88,16 +88,21 @@ desde ahí): nunca hay callejón sin salida. Por eso la CSP de cada página admi
 El arreglo de fondo es el plan de pago de Render (siempre encendido): con él esa pantalla casi no se ve.
 
 **Mantener despierta la prueba sin plan de pago.** Mientras la prueba esté en el plan gratuito de Render, el flujo
-`.github/workflows/despertar-prueba.yml` le pide una imagen pequeña cada 5 minutos, de 8:00 a 23:00 aproximadamente (hora de
-España): así de día no se duerme y el primer visitante no espera. Reglas que no hay que romper (las vigila
-`tests/test_despertar_prueba.py`): pide siempre un archivo estático y **nunca** `/api/health`, que consulta la base de datos y
+«Despertar la prueba» le pide una imagen pequeña cada 5 minutos, de 8:00 a 23:00 aproximadamente (hora de España): así de día no
+se duerme y el primer visitante no espera. **Hoy corre aquí**, en `.github/workflows/despertar-prueba.yml` (este repositorio sigue
+siendo público y allí los minutos de Actions son gratis). Su copia para el repositorio público `nirkana-sitio` vive en
+`ops/publico/despertar-prueba.yml`, de donde la copia `ops/publicar_sitio.py`; tienen el mismo código y solo difieren en los
+comentarios (lo vigila la prueba). **En el traspaso se borra el de aquí** en cuanto `nirkana-sitio` lo corre y antes de hacer
+privado este repositorio: en uno privado, un aviso cada 5 minutos gastaría los 2.000 minutos gratuitos del mes en pocos días.
+Reglas que no hay que romper (las vigila `tests/test_despertar_prueba.py`): pide siempre un archivo estático y **nunca** `/api/health`, que consulta la base de datos y
 gastaría las horas gratuitas de Neon; y no pasa de 17 horas al día, porque Render da 750 horas gratis al mes a todo el espacio
 (unas 500 las gasta esto; el resto cubre visitas de noche). De madrugada la prueba se duerme y la pantalla de espera de la web
 cubre ese primer clic. GitHub puede retrasar los avisos programados algún minuto, así que de vez en cuando alguien verá
 la pantalla de espera aunque sea de día.
 
-Cuando la prueba pase al plan Starter de Render (siempre encendido): en este repositorio, Settings → Secrets and variables →
-Actions → Variables → nueva variable `PRUEBA_DE_PAGO` = `si`. El flujo deja de pedir la imagen (puedes borrarlo más adelante).
+Cuando la prueba pase al plan Starter de Render (siempre encendido): en el repositorio donde corra el flujo (hoy este; tras el
+traspaso, `nirkana-sitio`), Settings → Secrets and variables → Actions → Variables → nueva variable `PRUEBA_DE_PAGO` = `si`. El
+flujo deja de pedir la imagen (puedes borrarlo más adelante, y `ops/publico/despertar-prueba.yml` con él).
 
 ### La demo («Probar la demo»)
 
@@ -258,8 +263,8 @@ automática con Shopify…), que no hay cifras de clientes ni certificaciones, q
 cumplido, que todas las imágenes y enlaces existen y que los datos estructurados (JSON-LD) son válidos y coinciden
 con las preguntas visibles. La CI lo ejecuta en cada cambio de `docs/`.
 
-`docs/caja/` es la «caja sin conexión» de la versión anterior (Streamlit); no está enlazada desde la web y lleva
-`noindex`. Es una página estática del producto anterior; se conserva para que su dirección no deje de responder.
+La «caja sin conexión» de la versión anterior (`/caja/`, un mini-programa del producto Streamlit, sin enlazar y con `noindex`) se
+quitó de la web al separar lo público de lo privado: era código de un producto anterior y no hacía falta publicarlo.
 
 ## Diseño: lo que conviene saber antes de tocarlo
 
