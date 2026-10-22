@@ -1,7 +1,7 @@
 # Tools for the tests and the checks of CI. The website itself has no dependencies: it is static files.
 pytest==9.1.1
 pyflakes==4.0.3
-ruff==0.17.0
+ruff==0.17.1
 # The Excel template of the cash count (ops/plantillas.py) and its test:
 openpyxl==3.1.5
 # Only to rewrite the screenshots (ops/capturas_web.py), not needed by CI:
