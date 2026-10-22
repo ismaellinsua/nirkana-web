@@ -26,8 +26,10 @@ detiene y `tests/web-publico.test.mjs` falla. Después se confirma y se sube en 
 - Las cuatro notas internas que se publicaban en `nirkana.es/<nombre>.md` están fuera de `docs/` (en el repositorio antiguo, PR #79).
 - `ops/publicar_sitio.py` y sus pruebas; `ops/publico/` (README y flujo de la copia pública); `/caja/` (el mini-programa de caja de la
   versión anterior, sin enlazar) quitado del sitio.
-- El flujo «Despertar la prueba» pasa a la copia pública (allí los minutos de Actions son gratis; en un repositorio privado se
-  acabarían en pocos días). Su texto vive en `ops/publico/despertar-prueba.yml`.
+- El flujo «Despertar la prueba» está preparado para la copia pública (`ops/publico/despertar-prueba.yml`): allí los minutos de
+  Actions son gratis; en un repositorio privado se acabarían en pocos días. **Hasta el traspaso sigue corriendo aquí**
+  (`.github/workflows/despertar-prueba.yml`, este repositorio aún es público) para que la prueba no se duerma; en el paso D4 Claude
+  lo borra de aquí cuando comprueba que ya corre en `nirkana-sitio`.
 
 ## Los pasos que haces tú (clics)
 
@@ -63,7 +65,8 @@ Así, el commit que GitHub hace por ti al poner el dominio (paso D3) no lleva tu
    (no cambies nada en tu registrador). Cuando se pueda, marca **Enforce HTTPS**.
 4. **Avisa a Claude.** Él lo comprueba desde la red de GitHub: DNS, certificado, redirecciones, todas las páginas, que las notas
    internas dan 404 y que la prueba de 24 horas responde (Actions → **Web** → *Run workflow* con **tras_traspaso** marcado, y
-   «Probar la prueba como un visitante»).
+   «Probar la prueba como un visitante»). También lanza «Despertar la prueba» a mano en `nirkana-sitio` y, si responde, lo
+   borra de este repositorio (dos avisos a la vez no hacen daño, pero uno sobra).
 
 ### E. Solo si D4 sale bien: todo lo demás, en privado
 
@@ -78,7 +81,8 @@ Así, el commit que GitHub hace por ti al poner el dominio (paso D3) no lleva tu
 7. **Repositorio antiguo → Settings → General → Danger Zone → Change visibility → Make private.** *(Opcional)* después, *Archive this
    repository*.
 8. **`nirkana-web` (este) → Settings → General → Danger Zone → Change visibility → Make private.** Antes de este clic, Claude confirma
-   que este repositorio ya no sirve nada y que «Despertar la prueba» corre en `nirkana-sitio`.
+   que este repositorio ya no sirve nada y que «Despertar la prueba» ya no corre aquí sino en `nirkana-sitio` (en privado, un aviso
+   cada 5 minutos gastaría los minutos gratuitos del mes en pocos días).
 
 ### F. Después
 
