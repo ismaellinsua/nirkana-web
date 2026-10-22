@@ -98,7 +98,9 @@ Reglas que no hay que romper (las vigila `tests/test_despertar_prueba.py`): pide
 gastaría las horas gratuitas de Neon; y no pasa de 17 horas al día, porque Render da 750 horas gratis al mes a todo el espacio
 (unas 500 las gasta esto; el resto cubre visitas de noche). De madrugada la prueba se duerme y la pantalla de espera de la web
 cubre ese primer clic. GitHub puede retrasar los avisos programados algún minuto, así que de vez en cuando alguien verá
-la pantalla de espera aunque sea de día.
+la pantalla de espera aunque sea de día. Además, GitHub **desactiva los avisos programados de un repositorio público si pasan 60 días
+sin ningún commit**: en `nirkana-sitio` cada publicación de la web cuenta como actividad; si un día se desactivan, se reactivan en
+Actions → «Despertar la prueba» → *Enable workflow*.
 
 Cuando la prueba pase al plan Starter de Render (siempre encendido): en el repositorio donde corra el flujo (hoy este; tras el
 traspaso, `nirkana-sitio`), Settings → Secrets and variables → Actions → Variables → nueva variable `PRUEBA_DE_PAGO` = `si`. El
