@@ -80,7 +80,9 @@ Así, el commit que GitHub hace por ti al poner el dominio (paso D3) no lleva tu
    repositorio. **Mira antes si publica algo en una dirección `*.workers.dev`:** ese contenido seguiría siendo público.
 7. **Repositorio antiguo → Settings → General → Danger Zone → Change visibility → Make private.** *(Opcional)* después, *Archive this
    repository*.
-8. **`nirkana-web` (este) → Settings → General → Danger Zone → Change visibility → Make private.** Antes de este clic, Claude confirma
+8. **`nirkana-web` (este) → Settings → Pages → Build and deployment → *Branch*: **None** → Save** (hoy también publica la web en
+   `ismaellinsua.github.io/nirkana-web`, sin dominio; al hacerlo privado dejaría de verse igualmente, pero así queda dicho).
+   Después: **Settings → General → Danger Zone → Change visibility → Make private.** Antes de estos clics, Claude confirma
    que este repositorio ya no sirve nada y que «Despertar la prueba» ya no corre aquí sino en `nirkana-sitio` (en privado, un aviso
    cada 5 minutos gastaría los minutos gratuitos del mes en pocos días).
 
