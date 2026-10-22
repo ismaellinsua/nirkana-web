@@ -88,8 +88,14 @@ Así, el commit que GitHub hace por ti al poner el dominio (paso D3) no lleva tu
 
 - **`nirkana-sitio` → Settings → Code security:** activa *Secret Protection* (y *Push protection*). Es el único repositorio público:
   que nunca se pueda subir ahí una clave por error.
-- **`nirkana-sitio` → Settings → Rules → Rulesets → Import a ruleset:** sube `ops/github/ruleset-main.json` si quieres `main`
-  protegida (sin borrar, sin reescribir historial). *(Opcional: solo se escribe ahí desde `ops/publicar_sitio.py`.)*
+- **`nirkana-sitio` → Settings → Rules → Rulesets → New ruleset → New branch ruleset** *(opcional)*: nombre `main`, *Enforcement
+  status* **Active**, *Target branches* → *Add target* → **Include default branch**, y marca solo **Restrict deletions** y **Block
+  force pushes**. Así `main` no se puede borrar ni reescribir. **No** marques «Require a pull request» ni «Require status checks»:
+  ahí no hay pruebas (viven en privado) y te bloquearían a ti y a Claude. *(No subas `ops/github/ruleset-main.json`: es el de este
+  repositorio y exige la comprobación «tests».)*
+- **Verifica el dominio** *(opcional, recomendado)*: tu foto → **Settings → Pages → Add a domain** → `nirkana.es` → GitHub te da un
+  registro TXT que añades en tu registrador (no cambia nada de la web) → **Verify**. Así ninguna otra cuenta de GitHub puede publicar
+  una web en `nirkana.es`, ni siquiera en los minutos en que el dominio no esté puesto en ningún repositorio.
 - Los avisos automáticos (comprobación diaria de la web, pruebas) pasan a gastar minutos de Actions de repositorios **privados**
   (2.000 al mes gratis, para todos tus repositorios privados juntos). Si se acaban, esos avisos dejan de salir hasta el mes siguiente;
   un monitor externo gratuito (UptimeRobot, 5 minutos de intervalo) vigila la web y la prueba sin gastar minutos.
