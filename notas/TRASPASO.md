@@ -1,59 +1,101 @@
-# Traspaso de la web a `nirkana-web` y repositorio antiguo en privado
+# Separar lo público de lo privado: la web a `nirkana-sitio` y todo lo demás en privado
 
-**Estado (14/10/2026): este repositorio está listo. Falta que tú hagas los clics de GitHub, cuando quieras.**
-`nirkana.es` sigue saliendo del repositorio antiguo (`smart-financial-advisor-demo`) hasta el paso 3. Nada de esto toca el DNS.
+**Estado (22/10/2026): Claude ha dejado preparado todo lo que no son clics de GitHub. Falta que tú crees un repositorio vacío y
+hagas los clics de los pasos B, D y E, cuando quieras.** `nirkana.es` sigue saliendo del repositorio antiguo hasta el paso D3.
+Nada de esto toca el DNS.
 
-Mientras no se haga el traspaso, **cada cambio de la web se hace en los dos repositorios** (en el antiguo, con su petición de
-cambios; aquí, directo) y `docs/` queda idéntico. Después del traspaso, solo aquí.
+## La idea, en una frase
 
-## Antes de empezar (lo comprobamos juntos; son 5 minutos)
+**Público: solo una copia de lo que ya ve cualquiera en nirkana.es** (`nirkana-sitio`). **Privado: todo lo demás** (el trabajo de la web,
+las notas, el código de apoyo, las pruebas, la app, el producto anterior).
 
-1. **Que `docs/` de aquí es idéntico a lo publicado.** Se comprueba comparando con el repositorio antiguo (lo hace Claude: solo
-   puede diferir en las 5 notas internas, que aquí viven en `notas/` y en el antiguo estaban en `docs/`).
-2. **Pruebas en verde** aquí (Actions → Tests, Web) y el comprobador diario de la web sin avisos.
-3. **¿Hay alguna app de Streamlit Cloud publicada desde el repositorio antiguo?** La web no la usa; si existe, dejará de
-   funcionar al hacerlo privado. Mira en <https://share.streamlit.io>.
-4. **Elige un momento tranquilo.** nirkana.es puede dar «404» entre 2 y 10 minutos, y el candado HTTPS nuevo puede tardar hasta
-   una hora en estar listo (mientras tanto, el navegador puede avisar de certificado no válido).
+| Repositorio | Antes | Después | Qué lleva |
+|---|---|---|---|
+| `nirkana-sitio` (**nuevo**) | no existe | **público** | Solo `docs/` (las páginas, estilos, scripts e imágenes de la web), un README corto, la licencia y el flujo que mantiene despierta la prueba. Historial nuevo y limpio: sin notas, sin código de apoyo, sin tu correo. |
+| `nirkana-web` (este) | público | **privado** | El trabajo de la web: `docs/` (de aquí sale lo que se publica), `ops/`, `tests/`, `notas/`, `legal/`. |
+| `smart-financial-advisor-demo` (el antiguo) | público, sirve nirkana.es | **privado** (y archivado) | El producto anterior (Streamlit), `marketing/`, `ops/` viejo. Con él se queda todo su historial, que deja de verse. |
+| `nirkana-app` | privado | privado | La aplicación. |
 
-## Los pasos (clics)
+**Cómo se publica a partir de ahora:** el cambio se hace aquí (en privado), pasa las pruebas y `python ops/publicar_sitio.py
+../nirkana-sitio` copia a la copia pública **solo** lo permitido (páginas, estilos, scripts, imágenes, la hoja de Excel,
+`robots.txt` y `sitemap.xml`). Si algo que no es de la web se cuela en `docs/` (una nota, un `.py`, un `.json`…), el script se
+detiene y `tests/web-publico.test.mjs` falla. Después se confirma y se sube en `nirkana-sitio`.
 
-1. **`nirkana-web` → Settings → Pages.** *Build and deployment* → *Deploy from a branch* → rama `main` → carpeta **`/docs`** →
-   **Save**. **No pongas el dominio todavía.** La web sale en `https://ismaellinsua.github.io/nirkana-web/` (sin estilos: usa
-   rutas desde la raíz; es normal). En Actions debe aparecer «pages build and deployment» en verde.
+## Lo que ya está hecho (no hay que tocar nada)
+
+- Las cuatro notas internas que se publicaban en `nirkana.es/<nombre>.md` están fuera de `docs/` (en el repositorio antiguo, PR #79).
+- `ops/publicar_sitio.py` y sus pruebas; `ops/publico/` (README y flujo de la copia pública); `/caja/` (el mini-programa de caja de la
+  versión anterior, sin enlazar) quitado del sitio.
+- El flujo «Despertar la prueba» pasa a la copia pública (allí los minutos de Actions son gratis; en un repositorio privado se
+  acabarían en pocos días). Su texto vive en `ops/publico/despertar-prueba.yml`.
+
+## Los pasos que haces tú (clics)
+
+### A. Tu correo, fuera de los commits (1 minuto, antes de B)
+
+Tu foto → **Settings → Emails** → marca **Keep my email addresses private** y **Block command line pushes that expose my email**.
+Así, el commit que GitHub hace por ti al poner el dominio (paso D3) no lleva tu correo personal.
+
+### B. Crear el repositorio público vacío (2 minutos)
+
+1. <https://github.com/new> → *Owner* `ismaellinsua` → *Repository name* **`nirkana-sitio`** → **Public** → **sin** README, **sin**
+   .gitignore, **sin** licencia → **Create repository**.
+2. Si la app de Claude en GitHub está instalada solo en repositorios elegidos: tu foto → **Settings → Applications → Installed
+   GitHub Apps → Claude → Configure → Repository access** → añade `nirkana-sitio` (si está en *All repositories*, no hace falta).
+3. **Avisa a Claude.** Él sube el contenido (un primer commit con la web tal como está publicada hoy, sin notas ni `/caja/`) y
+   comprueba que es idéntico.
+
+### C. Antes de seguir (lo comprobamos juntos; son 5 minutos)
+
+1. Que el contenido de `nirkana-sitio` es idéntico a lo publicado (lo hace Claude).
+2. **¿Hay alguna app de Streamlit Cloud publicada desde el repositorio antiguo?** La web no la usa; si existe, dejará de funcionar
+   al hacerlo privado. Mira en <https://share.streamlit.io>.
+3. **Elige un momento tranquilo.** nirkana.es puede dar «404» entre 2 y 10 minutos, y el candado HTTPS nuevo puede tardar hasta una
+   hora (mientras tanto, el navegador puede avisar de certificado no válido).
+
+### D. El traspaso del dominio
+
+1. **`nirkana-sitio` → Settings → Pages.** *Build and deployment* → *Deploy from a branch* → rama `main` → carpeta **`/docs`** →
+   **Save**. **No pongas el dominio todavía.** La web sale en `https://ismaellinsua.github.io/nirkana-sitio/` (sin estilos: usa rutas
+   desde la raíz; es normal). En Actions debe aparecer «pages build and deployment» en verde.
 2. **Repositorio antiguo → Settings → Pages.** Borra el *Custom domain* (`nirkana.es`) y guarda. **Haz el 3 justo después.**
-3. **`nirkana-web` → Settings → Pages.** *Custom domain* → `nirkana.es` → **Save**. Espera al tic verde de la comprobación de DNS
+3. **`nirkana-sitio` → Settings → Pages.** *Custom domain* → `nirkana.es` → **Save**. Espera al tic verde de la comprobación de DNS
    (no cambies nada en tu registrador). Cuando se pueda, marca **Enforce HTTPS**.
-4. **Avisa a Claude.** Él lanza, desde la red de GitHub:
-   - Actions → **Web** → *Run workflow* con **tras_traspaso** marcado: comprueba DNS, certificado, redirecciones, todas las
-     páginas **y que las notas internas ya devuelven 404**.
-   - Actions → **Probar la prueba como un visitante**: mide lo que vive quien pulsa «Probar gratis» en nirkana.es.
+4. **Avisa a Claude.** Él lo comprueba desde la red de GitHub: DNS, certificado, redirecciones, todas las páginas, que las notas
+   internas dan 404 y que la prueba de 24 horas responde (Actions → **Web** → *Run workflow* con **tras_traspaso** marcado, y
+   «Probar la prueba como un visitante»).
 
-## Solo si el paso 4 sale bien: el repositorio antiguo, privado
+### E. Solo si D4 sale bien: todo lo demás, en privado
 
-> **No lo hagas privado antes de verificar.** GitHub Pages en un repositorio privado es de pago: una vez privado, el antiguo ya
-> no podría volver a servir la web. Mientras sea público, volver atrás es poner de nuevo el dominio en su *Settings → Pages*.
+> **No lo hagas antes de verificar.** GitHub Pages en un repositorio privado es de pago: una vez privado, el antiguo ya no podría
+> volver a servir la web. Mientras sea público, volver atrás es poner de nuevo el dominio en su *Settings → Pages*.
 
 5. **Repositorio antiguo → Settings → Actions → General → Disable actions.** Tiene flujos programados viejos (la copia de seguridad
    falla cada madrugada, avisos, disponibilidad): en privado gastarían minutos y mandarían correos de error.
-6. **Quita la integración de Cloudflare** (*Workers Builds*, el aviso en rojo de las peticiones): GitHub → tu foto → *Settings* →
-   *Applications* → *Installed GitHub Apps* → Cloudflare Workers and Pages → *Configure* → quita el acceso a ese repositorio (o
-   desinstálala si no la usas).
-7. **Repositorio antiguo → Settings → General → Danger Zone → Change visibility → Make private.**
-8. *(Opcional)* Después, *Settings → General → Archive this repository*: queda de solo lectura.
+6. **Quita la integración de Cloudflare** del repositorio antiguo (*Workers Builds*, el aviso de las peticiones de cambios): tu foto →
+   *Settings* → *Applications* → *Installed GitHub Apps* → Cloudflare Workers and Pages → *Configure* → quita el acceso a ese
+   repositorio. **Mira antes si publica algo en una dirección `*.workers.dev`:** ese contenido seguiría siendo público.
+7. **Repositorio antiguo → Settings → General → Danger Zone → Change visibility → Make private.** *(Opcional)* después, *Archive this
+   repository*.
+8. **`nirkana-web` (este) → Settings → General → Danger Zone → Change visibility → Make private.** Antes de este clic, Claude confirma
+   que este repositorio ya no sirve nada y que «Despertar la prueba» corre en `nirkana-sitio`.
 
-## Después, en la cuenta y en este repositorio
+### F. Después
 
-- **Tu cuenta → Settings → Emails:** marca *Keep my email addresses private* y *Block command line pushes that expose my email*.
-- **`nirkana-web` → Settings → Rules → Rulesets → Import a ruleset:** sube `ops/github/ruleset-main.json` (main protegida: sin
-  borrar, sin reescribir historial, con petición de cambios y la prueba `tests` obligatoria).
-- **`nirkana-web` → Settings → Code security:** activa *Secret Protection* (y *Push protection*) y las alertas de Dependabot.
-- Claude cambia `web.yml` para que el comprobador diario use siempre `--sin-notas-internas` y actualiza los documentos de
-  `nirkana-app` que citan el repositorio antiguo.
+- **`nirkana-sitio` → Settings → Code security:** activa *Secret Protection* (y *Push protection*). Es el único repositorio público:
+  que nunca se pueda subir ahí una clave por error.
+- **`nirkana-sitio` → Settings → Rules → Rulesets → Import a ruleset:** sube `ops/github/ruleset-main.json` si quieres `main`
+  protegida (sin borrar, sin reescribir historial). *(Opcional: solo se escribe ahí desde `ops/publicar_sitio.py`.)*
+- Los avisos automáticos (comprobación diaria de la web, pruebas) pasan a gastar minutos de Actions de repositorios **privados**
+  (2.000 al mes gratis, para todos tus repositorios privados juntos). Si se acaban, esos avisos dejan de salir hasta el mes siguiente;
+  un monitor externo gratuito (UptimeRobot, 5 minutos de intervalo) vigila la web y la prueba sin gastar minutos.
+- Claude actualiza los documentos de `nirkana-app` que citan el repositorio antiguo.
 
 ## Qué cambia en el día a día
 
-- La web se edita aquí (`docs/`). La demo publicada es `docs/demo/index.html` (se genera en `nirkana-app`: `demo/LEEME.md`).
+- La web se edita aquí (`docs/`), en privado. Se publica con `python ops/publicar_sitio.py ../nirkana-sitio` y un commit allí.
+- La demo publicada es `docs/demo/index.html` (se genera en `nirkana-app`: `demo/LEEME.md`). **Es código que cualquiera puede ver en
+  nirkana.es:** lo que se publica en una web siempre se puede leer, así que la demo solo debe llevar datos y lógica ficticios.
 - `python ops/precio.py` lee o cambia el precio de la home en sus 8 sitios (`python ops/precio.py 60`).
 - `python ops/legal.py` genera el aviso legal cuando haya datos (`legal/PENDIENTES-PUBLICACION.md`).
-- Esta carpeta `notas/` es visible en GitHub (el repositorio es público) pero **no** se publica en nirkana.es.
+- Esta carpeta `notas/` es privada en cuanto este repositorio lo sea; mientras tanto, **no se publica** en nirkana.es ni en `nirkana-sitio`.

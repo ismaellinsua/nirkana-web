@@ -4,7 +4,8 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = (ROOT / ".github/workflows/despertar-prueba.yml").read_text(encoding="utf-8")
+# The workflow runs in the public repository (free Actions minutes there); this is the copy ops/publicar_sitio.py puts in it.
+WORKFLOW = (ROOT / "ops/publico/despertar-prueba.yml").read_text(encoding="utf-8")
 SITE = (ROOT / "docs/assets/site.js").read_text(encoding="utf-8")
 
 # Render gives 750 free instance hours a month to the whole workspace; leave room for visitors at night.

@@ -8,8 +8,9 @@ todavía sin desplegar.*
   servicio `nirkana` de Render existe pero **todavía no está desplegado**; su dirección prevista es `app.nirkana.es`.
 - El mismo código en modo `prueba`, con **otra base de datos** (Neon propia), es la prueba de 24 horas: servicio `nirkana-prueba` de Render, en
   `https://nirkana-prueba.onrender.com` (sin dominio propio por ahora). `TRIAL_URL` de `docs/assets/site.js` apunta a ella.
-- `docs/` de este repositorio (**público**): la web comercial estática de `nirkana.es`, publicada con GitHub Pages. Hoy sigue saliendo del
-  repositorio antiguo; pasará a salir de este con el traspaso (`TRASPASO.md`).
+- `docs/` de este repositorio (de trabajo, **privado** tras el traspaso): la web comercial estática de `nirkana.es`. Lo que se ve en
+  nirkana.es sale de una **copia** de esa carpeta en el repositorio público `nirkana-sitio` (GitHub Pages), que solo lleva archivos de la
+  web y que rellena `ops/publicar_sitio.py`. Hoy sigue saliendo del repositorio antiguo; el cambio se hace con `TRASPASO.md`.
 - `docs/demo/`: la demostración **sin registro**, con datos ficticios, que funciona dentro del navegador. No es la prueba de 24 horas.
 - El producto anterior (Streamlit, `sales_manager/`) sigue en el repositorio antiguo, que pasará a privado. No debe convertirse en backend de
   clientes ni conectarse a datos de producción.
@@ -22,7 +23,8 @@ todavía sin desplegar.*
 3. `APP_URL` sigue vacío hasta que exista la app de clientes. `TRIAL_URL` ya está puesto. `DEMO_URL` es `/demo/`.
 4. La demostración sin registro no promete 24 horas de acceso; ese plazo es solo del servicio en modo `prueba`.
 5. Toda venta o contratación real se gestiona desde `nirkana.oficial@gmail.com` hasta validar el circuito de pagos.
-6. Los repositorios de la web (este y el antiguo) son públicos: nada que no deba verse puede estar en ellos.
+6. El único repositorio público es `nirkana-sitio` (la copia de lo que ya se ve en nirkana.es): nada que no deba verse puede estar en él.
+   Todo lo demás es privado.
 7. No afirmar conformidad fiscal o VERI*FACTU sin pruebas oficiales y revisión legal (`tests/web-claims.test.mjs` lo impide).
 8. Antes de fusionar un cambio: pasar las pruebas, revisar los enlaces y mirar la web en móvil y en escritorio.
 
@@ -31,6 +33,6 @@ Visita a `nirkana.es` → demostración inmediata (opcional) → prueba de 24 ho
 → alta manual del cliente en producción.
 
 ## Riesgo pendiente
-Mientras el repositorio antiguo siga siendo público, contiene además `sales_manager/`, `ops/`, `legal/` y `marketing/`, y publica en
-`nirkana.es` cuatro notas internas que aquí viven en `notas/`. Por eso la web se traspasa a este repositorio y el antiguo pasa a privado
+Hasta que se haga el traspaso, el repositorio antiguo y este siguen siendo públicos y contienen más que la web (código de apoyo,
+notas, plantillas, el producto anterior). Por eso la web se traspasa a `nirkana-sitio` y los otros dos pasan a privado
 (`TRASPASO.md`).
