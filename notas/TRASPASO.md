@@ -11,7 +11,7 @@ las notas, el código de apoyo, las pruebas, la app, el producto anterior).
 
 | Repositorio | Antes | Después | Qué lleva |
 |---|---|---|---|
-| `nirkana-sitio` (**nuevo**) | no existe | **público** | Solo `docs/` (las páginas, estilos, scripts e imágenes de la web), un README corto, la licencia y el flujo que mantiene despierta la prueba. Historial nuevo y limpio: sin notas, sin código de apoyo, sin tu correo. |
+| `nirkana-sitio` (**nuevo**) | no existe | **público** | Solo `docs/` (las páginas, estilos, scripts e imágenes de la web), un README corto, una licencia de «todos los derechos reservados» (la de aquí nombra las librerías de la app anterior; la pública no) y el flujo que mantiene despierta la prueba. Historial nuevo y limpio: sin notas, sin código de apoyo, sin tu correo. |
 | `nirkana-web` (este) | público | **privado** | El trabajo de la web: `docs/` (de aquí sale lo que se publica), `ops/`, `tests/`, `notas/`, `legal/`. |
 | `smart-financial-advisor-demo` (el antiguo) | público, sirve nirkana.es | **privado** (y archivado) | El producto anterior (Streamlit), `marketing/`, `ops/` viejo. Con él se queda todo su historial, que deja de verse. |
 | `nirkana-app` | privado | privado | La aplicación. |

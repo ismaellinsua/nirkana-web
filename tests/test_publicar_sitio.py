@@ -19,23 +19,23 @@ def write(path: Path, text: str = "x") -> Path:
 
 @pytest.fixture
 def world(tmp_path):
-    """A small private repository (docs, templates, license) and an empty public checkout."""
+    """A small private repository (docs and templates) and an empty public checkout."""
     docs, templates = tmp_path / "docs", tmp_path / "ops" / "publico"
     write(docs / "index.html", "<html></html>")
     write(docs / "assets" / "site.css", "a{}")
     write(docs / ".nojekyll", "")
     write(docs / "CNAME", "nirkana.es")
     write(templates / "README.md", "# nirkana.es")
+    write(templates / "LICENSE", "todos los derechos reservados")
     write(templates / "despertar-prueba.yml", "name: x")
-    write(tmp_path / "LICENSE", "todos los derechos reservados")
     public = tmp_path / "publico"
     (public / ".git").mkdir(parents=True)
-    return docs, templates, tmp_path, public
+    return docs, templates, public
 
 
 def tree(world):
-    docs, templates, root, _ = world
-    return publish.expected(docs, templates, root)
+    docs, templates, _ = world
+    return publish.expected(docs, templates)
 
 
 def test_the_real_docs_only_hold_files_of_the_website():
@@ -46,7 +46,7 @@ def test_the_real_docs_only_hold_files_of_the_website():
 
 
 def test_a_note_or_a_script_in_docs_stops_the_publication(world):
-    docs, _, _, _ = world
+    docs, _, _ = world
     write(docs / "NOTA-INTERNA.md")
     write(docs / "assets" / "ayuda.py")
     with pytest.raises(publish.PublishError) as error:
@@ -55,13 +55,13 @@ def test_a_note_or_a_script_in_docs_stops_the_publication(world):
 
 
 def test_the_folder_of_the_previous_product_is_not_published(world):
-    docs, _, _, _ = world
+    docs, _, _ = world
     write(docs / "caja" / "index.html")
     assert not [name for name in tree(world) if name.startswith("docs/caja")]
 
 
 def test_the_copy_is_the_site_plus_three_fixed_files_and_never_the_domain_file(world):
-    _, _, _, public = world
+    _, _, public = world
     add, change, remove = publish.apply(public, tree(world))
     assert sorted(add) == [".github/workflows/despertar-prueba.yml", "LICENSE", "README.md", "docs/.nojekyll", "docs/assets/site.css", "docs/index.html"]
     assert change == [] and remove == []
@@ -69,7 +69,7 @@ def test_the_copy_is_the_site_plus_three_fixed_files_and_never_the_domain_file(w
 
 
 def test_what_github_wrote_for_the_domain_is_kept_and_what_does_not_belong_is_removed(world):
-    docs, _, _, public = world
+    docs, _, public = world
     publish.apply(public, tree(world))
     write(public / "docs" / "CNAME", "nirkana.es")                    # written by GitHub when the domain is set
     write(public / "docs" / "caja" / "index.html")                    # an old file that must not stay
@@ -83,19 +83,16 @@ def test_what_github_wrote_for_the_domain_is_kept_and_what_does_not_belong_is_re
 
 
 def test_the_git_folder_of_the_public_copy_is_never_touched(world):
-    _, _, _, public = world
+    _, _, public = world
     write(public / ".git" / "config", "[core]")
     publish.apply(public, tree(world))
     assert (public / ".git" / "config").read_text() == "[core]"
 
 
 def test_check_mode_writes_nothing_and_says_whether_the_copy_matches(world, capsys, monkeypatch):
-    docs, templates, root, public = world
-    monkeypatch.setattr(publish, "DOCS", docs)
-    monkeypatch.setattr(publish, "TEMPLATES", templates)
-    monkeypatch.setattr(publish, "ROOT", root)
+    docs, templates, public = world
     original = publish.expected
-    monkeypatch.setattr(publish, "expected", lambda: original(docs, templates, root))
+    monkeypatch.setattr(publish, "expected", lambda: original(docs, templates))
     assert publish.main([str(public), "--check"]) == 1
     assert not (public / "docs").exists(), "--check no escribe"
     assert "falta: docs/index.html" in capsys.readouterr().err
@@ -113,6 +110,13 @@ def test_the_public_readme_says_nothing_about_what_stays_private():
     for private in ("notas", "ops/", "tests", "legal", "Render", "Neon", "nirkana-app", "secret", "token"):
         assert private.lower() not in text.lower(), private
     assert "nirkana.es" in text and "LICENSE" in text
+
+
+def test_the_public_license_reserves_the_rights_and_names_none_of_the_private_stack():
+    text = (ROOT / "ops" / "publico" / "LICENSE").read_text(encoding="utf-8")
+    for private in ("Streamlit", "pandas", "Plotly", "psycopg", "código fuente", "source code", "Render", "Neon"):
+        assert private.lower() not in text.lower(), private
+    assert "TODOS LOS DERECHOS RESERVADOS" in text and "ALL RIGHTS RESERVED" in text
 
 
 def test_the_public_keep_alive_workflow_keeps_its_rules_and_tells_no_story():
